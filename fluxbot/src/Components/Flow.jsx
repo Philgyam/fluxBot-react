@@ -30,6 +30,18 @@ function Flow({ isExpanded }) {
   const [edges, setEdges] = useState([]);
   const [selectedNode, setSelectedNode] = useState(null);
   const [contextMenu, setContextMenu] = useState(null);
+  const [showPane, setShowPane] = useState(false);
+
+
+
+  const togglePane = () => {
+    setShowPane(!showPane);
+  };
+
+  const closePane = () => {
+    setShowPane(false);
+  };
+
 
   const onNodeClick = (event, node) => {
     setSelectedNode(node);
@@ -133,6 +145,10 @@ function Flow({ isExpanded }) {
   };
 
   return (
+    <>
+     {showPane && (
+        <Pane/>
+      )}
     <div
       style={{ height: '100vh', position: 'relative' }}
       className="bg-gray-900 h-full flex transition-all duration-300"
@@ -190,6 +206,7 @@ function Flow({ isExpanded }) {
         </div>
       )}
     </div>
+    </>
   );
 }
 

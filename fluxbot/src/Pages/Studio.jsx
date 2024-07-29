@@ -4,6 +4,7 @@ import { FaPlay } from "react-icons/fa";
 import { IoShareSocialOutline } from "react-icons/io5";
 import { IoRocketOutline } from "react-icons/io5";
 import Flow from '../Components/Flow';
+import Pane from '../Components/Pane';
 
 
 
@@ -21,7 +22,7 @@ function Studio() {
             </div>
             </h1>
         <Menubar/>
-        {/* <Flow/> */}
+        
     </div>
   )
 }

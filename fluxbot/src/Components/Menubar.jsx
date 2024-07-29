@@ -1,19 +1,16 @@
 import React, { useState } from 'react';
-import { FaRobot, FaProjectDiagram, FaCogs, FaChartBar, FaTools, FaUserShield, FaQuestionCircle, FaSignOutAlt, FaBars, FaFileAlt, FaImage } from "react-icons/fa";
+import { FaRobot, FaProjectDiagram, FaCogs, FaChartBar, FaTools, FaUserShield, FaQuestionCircle, FaSignOutAlt, FaBars, FaImage } from "react-icons/fa";
 import { CiSettings } from "react-icons/ci";
-import { IoExtensionPuzzleOutline, IoArrowDownSharp, IoLocationSharp, IoVideocam } from "react-icons/io5";
+import { IoExtensionPuzzleOutline, IoArrowDownSharp, IoLocationSharp } from "react-icons/io5";
 import { LuTestTube2 } from "react-icons/lu";
 import { AiOutlineDeploymentUnit, AiOutlineFileText, AiOutlineAudio } from "react-icons/ai";
 import { TiFlowMerge } from "react-icons/ti";
-import { FaDatabase, FaFileAudio } from "react-icons/fa6";
+import { FaDatabase } from "react-icons/fa6";
 import { MdOutlineCreateNewFolder } from "react-icons/md";
-import { ImFileEmpty } from "react-icons/im";
-import { CiVideoOn } from "react-icons/ci";
 
+import Pane from './Pane';
 
 import Flow from './Flow';
-
-
 
 function Menubar() {
   const [isExpanded, setIsExpanded] = useState(true);
@@ -40,9 +37,22 @@ function Menubar() {
     setShowPane(false);
   };
 
+ 
   return (
     <div className="flex">
       <div className={`fixed top-10 left-0 h-full bg-black p-5 shadow-lg transition-all duration-300 ${isExpanded ? 'w-64' : 'w-16'}`}>
+        <div className="flex justify-between items-center mb-5 ">
+          <div className="flex items-center gap-3 text-white ">
+            <FaRobot />
+            {isExpanded && <span>BotFlow Studio</span>}
+          </div>
+          <button onClick={toggleSidebar} className="text-white ml-4">
+            <FaBars />
+          </button>
+         
+        </div>
+        <ul className="list-none flex gap-2 flex-col p-0">
+        <div className={`fixed top-10 left-0 h-full bg-black p-5 shadow-lg transition-all duration-300 ${isExpanded ? 'w-64' : 'w-16'}`}>
         <div className="flex justify-between items-center mb-5 ">
           <div className="flex items-center gap-3 text-white ">
             <FaRobot />
@@ -165,48 +175,11 @@ function Menubar() {
           </li>
         </ul>
       </div>
-      {showPane && (
-        <div className='absolute px-4  gap-3 left-[8rem] flex flex-col justify-around items-start py-5  bg-[#222831] w-[20rem] h-[40rem] z-[1000] text-white'>
-          <div className='w-full h-full rounded-xl pt-2 pb-2 pl-2 pr-2 border-2 border-white'>
-  <h2 className='text-lg font-bold mb-4'>Message Cards</h2>
-  <div className='grid grid-cols-3 gap-2'>
-              <div className='border-2 border-white w-full rounded-sm p-2 flex items-center gap-2'>
-                <AiOutlineFileText />
-                text
-              </div>
-              <div className='border-2 border-white w-full rounded-sm p-2 flex items-center gap-2'>
-                <IoLocationSharp />
-                Location
-              </div>
-              <div className='border-2 border-white w-full rounded-sm p-2 flex items-center gap-2'>
-              <ImFileEmpty />
-                file
-              </div>
-              <div className='border-2 border-white w-full rounded-sm p-2 flex items-center gap-2'>
-                <AiOutlineAudio />
-                audio
-              </div>
-              <div className='border-2 border-white w-full rounded-sm p-2 flex items-center gap-2'>
-              <CiVideoOn />
-                video
-              </div>
-              <div className='border-2 border-white w-full rounded-sm p-2 flex items-center gap-2'>
-                <AiOutlineDeploymentUnit />
-                carousel
-              </div>
-              <div className='border-2 border-white w-full rounded-sm p-2 flex items-center gap-2'>
-                <FaImage />
-                image
-              </div>
-            </div>
-          </div>
-
-      
-
-          <div  className=' w-full h-full border-2 pt-2 pl-2 border-white rounded-xl'>Query Cards </div>
-          <div  className=' w-full h-full border-2 pt-2 pl-2 border-white rounded-xl'>Logic</div>
-        </div>
-      )}
+        </ul>
+      </div>
+      {/* {showPane && (
+        <Pane/>
+      )} */}
       <div className={`transition-all duration-300 flex-grow ${isExpanded ? 'w-[85%] ml-[17%]' : 'w-[100%] ml-[5%]'}`}>
         <Flow isExpanded={isExpanded} />
       </div>
