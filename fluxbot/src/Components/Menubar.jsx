@@ -177,9 +177,9 @@ function Menubar() {
       </div>
         </ul>
       </div>
-      {/* {showPane && (
+      {showPane && (
         <Pane/>
-      )} */}
+      )}
       <div className={`transition-all duration-300 flex-grow ${isExpanded ? 'w-[85%] ml-[17%]' : 'w-[100%] ml-[5%]'}`}>
         <Flow isExpanded={isExpanded} />
       </div>
