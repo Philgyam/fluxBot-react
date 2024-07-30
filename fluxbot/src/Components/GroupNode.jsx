@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Handle, Position } from 'reactflow';
 import { IoIosAddCircleOutline } from "react-icons/io";
 
-const GroupNode = ({ data }) => {
+const GroupNode = ({ data, onAddChild }) => {
   const [children, setChildren] = useState(data.children);
   const [childCounter, setChildCounter] = useState(children.length);
   const [inputValue, setInputValue] = useState("New node");
@@ -21,6 +21,11 @@ const GroupNode = ({ data }) => {
     setChildren([...children, newChild]);
     setChildCounter(childCounter + 1); // Increment child counter
     setInputValue("New node"); // Reset input value after adding a child
+    if (onAddChild) onAddChild(); // Call the prop function to toggle the pane
+  };
+
+  const handleChildClick = () => {
+    if (onAddChild) onAddChild(); // Call the prop function when a child is clicked
   };
 
   return (
@@ -35,7 +40,11 @@ const GroupNode = ({ data }) => {
       </div>
       <div className="p-1">
         {children.map((child) => (
-          <div key={child.id} className="bg-gray-100 rounded p-2 m-2 shadow-inner">
+          <div
+            key={child.id}
+            className="bg-gray-100 rounded p-2 m-2 shadow-inner"
+            onClick={handleChildClick} // Add click handler to open the pane
+          >
             {child.data.label}
           </div>
         ))}

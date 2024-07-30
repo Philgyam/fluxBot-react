@@ -52,7 +52,7 @@ function Pane() {
   };
 
   return (
-    <div className="absolute px-4 drops gap-3 left-[8rem] flex flex-col justify-around items-start py-5 bg-[#222831] w-[20rem] h-[40rem] z-[1000] text-white">
+    <div className="absolute px-4 drops gap-3 top-[4rem] flex flex-col justify-around items-start py-5 bg-[#222831] w-[20rem] h-[40rem] z-[1000] text-white">
       <div className="w-full h-full rounded-xl pt-2 pb-2 pl-2 pr-2 border-2 border-white">
         <h2 className="text-lg font-bold mb-4">Message Cards</h2>
         <div className="grid grid-cols-3 gap-2">

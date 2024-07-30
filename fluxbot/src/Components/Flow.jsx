@@ -1,8 +1,8 @@
 import React, { useState, useCallback } from 'react';
+import { IoArrowDownSharp, IoArrowUpSharp } from "react-icons/io5";
 import ReactFlow, {
   Controls,
   Background,
-  MiniMap,
   addEdge as rfAddEdge,
   applyEdgeChanges,
   applyNodeChanges,
@@ -11,6 +11,7 @@ import ReactFlow, {
 import 'reactflow/dist/style.css';
 import { FaTrashAlt, FaClone } from 'react-icons/fa';
 import GroupNode from './GroupNode';
+import Pane from './Pane';
 
 const initialNodes = [
   {
@@ -25,23 +26,16 @@ const nodeTypes = {
   groupNode: GroupNode,
 };
 
-function Flow({ isExpanded }) {
+function Flow() {
   const [nodes, setNodes] = useState(initialNodes);
   const [edges, setEdges] = useState([]);
   const [selectedNode, setSelectedNode] = useState(null);
   const [contextMenu, setContextMenu] = useState(null);
   const [showPane, setShowPane] = useState(false);
 
-
-
   const togglePane = () => {
-    setShowPane(!showPane);
+    setShowPane((prevShowPane) => !prevShowPane);
   };
-
-  const closePane = () => {
-    setShowPane(false);
-  };
-
 
   const onNodeClick = (event, node) => {
     setSelectedNode(node);
@@ -95,7 +89,7 @@ function Flow({ isExpanded }) {
   const addEdgeManually = (source, target) => {
     const sourceNode = nodes.find((node) => node.id === source);
     const targetNode = nodes.find((node) => node.id === target);
-  
+
     if (sourceNode && targetNode) {
       const newEdge = {
         id: `edge-${edges.length + 1}`,
@@ -104,7 +98,7 @@ function Flow({ isExpanded }) {
         type: 'default',
         data: { label: `Edge ${edges.length + 1}` },
       };
-  
+
       setEdges((prevEdges) => [...prevEdges, newEdge]);
     }
   };
@@ -146,66 +140,66 @@ function Flow({ isExpanded }) {
 
   return (
     <>
-     {showPane && (
-        <Pane/>
-      )}
-    <div
-      style={{ height: '100vh', position: 'relative' }}
-      className="bg-gray-900 h-full flex transition-all duration-300"
-      onClick={() => setContextMenu(null)}
-    >
-      <div className="absolute top-0 left-0 p-2 space-x-2 z-10">
-        <button
-          onClick={addGroupNode}
-          className="px-4 py-2 bg-blue-500 text-white rounded-md"
-        >
-          Add Node
-        </button>
-        <button
-          onClick={() => addEdgeManually('1', '2')}
-          className="px-4 py-2 bg-green-500 text-white rounded-md"
-        >
-          Add Edge
-        </button>
-      </div>
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
-        onNodeContextMenu={onNodeContextMenu}
-        className="w-full h-full"
-        nodeTypes={nodeTypes}
+      <div
+        style={{ height: '100vh', position: 'relative' }}
+        className="bg-gray-900 h-full flex transition-all duration-300"
+        onClick={() => setContextMenu(null)}
       >
-        <Controls position="top-right" />
-        <Background />
-      </ReactFlow>
-      {contextMenu && (
-        <div
-          className="absolute bg-gray-700 text-white rounded-md border border-gray-800 shadow-lg p-2"
-          style={{
-            left: contextMenu.mouseX,
-            top: contextMenu.mouseY,
-          }}
-        >
+        <div className="absolute top-0 left-0 p-2 space-x-2 z-10">
           <button
-            onClick={() => handleContextMenuAction('delete')}
-            className="flex items-center space-x-2 px-4 py-2 rounded-md bg-gray-800 hover:bg-red-600 hover:text-white transition duration-300"
+            onClick={addGroupNode}
+            className="px-4 py-2 bg-blue-500 text-white rounded-md"
           >
-            <FaTrashAlt /> {/* Icon */}
-            <span>Delete Node</span>
+            Add Node
           </button>
-          <button
-            onClick={() => handleContextMenuAction('duplicate')}
-            className="flex items-center space-x-2 px-4 py-2 rounded-md bg-gray-800 hover:bg-blue-600 hover:text-white transition duration-300 mt-2"
-          >
-            <FaClone /> {/* Icon */}
-            <span>Duplicate Node</span>
+        
+          <button onClick={togglePane} className=''>
+            {showPane ? <IoArrowUpSharp style={{ color: 'white' }} /> : <IoArrowDownSharp style={{ color: 'white' }} />}
           </button>
         </div>
-      )}
-    </div>
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          onNodeContextMenu={onNodeContextMenu}
+          className="w-full h-full"
+          nodeTypes={nodeTypes}
+        >
+          <Controls position="top-right" />
+          <Background />
+        </ReactFlow>
+        {contextMenu && (
+          <div
+            className="absolute bg-gray-700 text-white rounded-md border border-gray-800 shadow-lg p-2"
+            style={{
+              left: contextMenu.mouseX,
+              top: contextMenu.mouseY,
+            }}
+          >
+            <button
+              onClick={() => handleContextMenuAction('delete')}
+              className="flex items-center space-x-2 px-4 py-2 rounded-md bg-gray-800 hover:bg-red-600 hover:text-white transition duration-300"
+            >
+              <FaTrashAlt /> {/* Icon */}
+              <span>Delete Node</span>
+            </button>
+            <button
+              onClick={() => handleContextMenuAction('duplicate')}
+              className="flex items-center space-x-2 px-4 py-2 rounded-md bg-gray-800 hover:bg-blue-600 hover:text-white transition duration-300 mt-2"
+            >
+              <FaClone /> {/* Icon */}
+              <span>Duplicate Node</span>
+            </button>
+          </div>
+        )}
+        {showPane && (
+          <div className="absolute top-0 left-0 z-50">
+            <Pane />
+          </div>
+        )}
+      </div>
     </>
   );
 }

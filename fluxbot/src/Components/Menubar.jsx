@@ -8,14 +8,14 @@ import { TiFlowMerge } from "react-icons/ti";
 import { FaDatabase } from "react-icons/fa6";
 import { MdOutlineCreateNewFolder } from "react-icons/md";
 
-import Pane from './Pane';
+
 
 import Flow from './Flow';
 
 function Menubar() {
   const [isExpanded, setIsExpanded] = useState(true);
   const [hoveredIndex, setHoveredIndex] = useState(-1);
-  const [showPane, setShowPane] = useState(false);
+
 
   const toggleSidebar = () => {
     setIsExpanded(!isExpanded);
@@ -29,13 +29,9 @@ function Menubar() {
     setHoveredIndex(-1);
   };
 
-  const togglePane = () => {
-    setShowPane(!showPane);
-  };
 
-  const closePane = () => {
-    setShowPane(false);
-  };
+
+
 
  
   return (
@@ -61,9 +57,7 @@ function Menubar() {
           <button onClick={toggleSidebar} className="text-white ml-4">
             <FaBars />
           </button>
-          <button onClick={togglePane} className=''>
-            <IoArrowDownSharp style={{color:'white'}} />
-          </button>
+         
         </div>
         <ul className="list-none flex gap-2 flex-col p-0">
           <li
@@ -177,9 +171,7 @@ function Menubar() {
       </div>
         </ul>
       </div>
-      {showPane && (
-        <Pane/>
-      )}
+    
       <div className={`transition-all duration-300 flex-grow ${isExpanded ? 'w-[85%] ml-[17%]' : 'w-[100%] ml-[5%]'}`}>
         <Flow isExpanded={isExpanded} />
       </div>
