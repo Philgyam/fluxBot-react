@@ -32,7 +32,16 @@ function Menubar() {
 
 
 
-
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    if (over && over.id === 'droppable-div') {
+      const activeItem = paneItems.find(item => item.id === active.id);
+      if (activeItem) {
+        // Add the dropped item to the droppedItems state
+        setDroppedItems((prev) => [...prev, activeItem]);
+      }
+    }
+  };
 
  
   return (
@@ -174,7 +183,7 @@ function Menubar() {
       </div>
     
       <div className={`transition-all duration-300 flex-grow ${isExpanded ? 'w-[85%] ml-[17%]' : 'w-[100%] ml-[5%]'}`}>
-      <DndContext  collisionDetection={closestCorners}>
+      <DndContext  collisionDetection={closestCorners} onDragEnd={handleDragEnd}>
         <Flow isExpanded={isExpanded} />
         </DndContext>
       </div>
