@@ -7,6 +7,7 @@ import { AiOutlineDeploymentUnit, AiOutlineFileText, AiOutlineAudio } from "reac
 import { TiFlowMerge } from "react-icons/ti";
 import { FaDatabase } from "react-icons/fa6";
 import { MdOutlineCreateNewFolder } from "react-icons/md";
+import { closestCorners, DndContext } from '@dnd-kit/core';
 
 
 
@@ -173,7 +174,9 @@ function Menubar() {
       </div>
     
       <div className={`transition-all duration-300 flex-grow ${isExpanded ? 'w-[85%] ml-[17%]' : 'w-[100%] ml-[5%]'}`}>
+      <DndContext  collisionDetection={closestCorners}>
         <Flow isExpanded={isExpanded} />
+        </DndContext>
       </div>
     </div>
   );
