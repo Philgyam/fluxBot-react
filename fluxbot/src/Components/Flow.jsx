@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback } from 'react';
 import ReactFlow, {
   Controls,
   Background,
@@ -35,8 +35,15 @@ function Flow() {
   const [selectedNode, setSelectedNode] = useState(null);
   const [contextMenu, setContextMenu] = useState(null);
   const [showPane, setShowPane] = useState(false);
-
-  const reactFlowWrapper = useRef(null);
+  const [paneItems, setPaneItems] = useState([
+    { id: '0', icon: <AiOutlineFileText />, label: 'Text' },
+    { id: '1', icon: <IoLocationSharp />, label: 'Location' },
+    { id: '2', icon: <ImFileEmpty />, label: 'File' },
+    { id: '3', icon: <AiOutlineAudio />, label: 'Audio' },
+    { id: '4', icon: <CiVideoOn />, label: 'Video' },
+    { id: '5', icon: <AiOutlineDeploymentUnit />, label: 'Carousel' },
+    { id: '6', icon: <FaImage />, label: 'Image' },
+  ]);
 
   const togglePane = () => {
     setShowPane((prevShowPane) => !prevShowPane);
@@ -55,16 +62,6 @@ function Flow() {
     });
   };
 
-  const [paneItems] = useState([
-    { id: '0', icon: <AiOutlineFileText />, label: 'Text' },
-    { id: '1', icon: <IoLocationSharp />, label: 'Location' },
-    { id: '2', icon: <ImFileEmpty />, label: 'File' },
-    { id: '3', icon: <AiOutlineAudio />, label: 'Audio' },
-    { id: '4', icon: <CiVideoOn />, label: 'Video' },
-    { id: '5', icon: <AiOutlineDeploymentUnit />, label: 'Carousel' },
-    { id: '6', icon: <FaImage />, label: 'Image' },
-  ]);
-
   const onNodesChange = useCallback(
     (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
     []
@@ -80,7 +77,7 @@ function Flow() {
     []
   );
 
-  const addGroupNode = () => {
+  const addGroupNode = (position) => {
     const newNodeId = `node-${nodes.length + 1}`;
     const newChildId = `node-${nodes.length + 2}`;
     const newNode = {
@@ -95,7 +92,7 @@ function Flow() {
           },
         ],
       },
-      position: { x: Math.random() * 400, y: Math.random() * 400 },
+      position: position || { x: Math.random() * 400, y: Math.random() * 400 },
     };
 
     setNodes((prevNodes) => [...prevNodes, newNode]);
@@ -136,16 +133,48 @@ function Flow() {
     }
   };
 
+  // Drag-and-drop functionality
+  const [activeCard, setActiveCard] = useState(null);
+  const [showDrop, setShowDrop] = useState(false);
+
+  const handleDragOver = (event) => {
+    event.preventDefault();
+    setShowDrop(true);
+  };
+
+  const handleDrop = (event) => {
+    event.preventDefault();
+    event.stopPropagation(); 
+    setShowDrop(false);
+  
+    // Check if the drop target has the ID 'flow-area'
+    const targetElement = event.currentTarget;
+    if (targetElement.id === 'flow-area') {
+      // Calculate the drop position relative to the ReactFlow container
+      const containerRect = targetElement.getBoundingClientRect();
+      const x = event.clientX - containerRect.left;
+      const y = event.clientY - containerRect.top;
+  
+      // Call the function to add a new node
+      addGroupNode({ x, y });
+    } else {
+      // Do nothing if the drop target doesn't have the ID 'flow-area'
+      console.log('Drop target is not the flow area.');
+    }
+  };
+  
+
   return (
     <div
-      ref={reactFlowWrapper}
       style={{ height: '100vh', position: 'relative' }}
       className="bg-gray-900 h-full flex transition-all duration-300"
       onClick={() => setContextMenu(null)}
+      onDragOver={handleDragOver}
+     
     >
       <div className="absolute top-0 left-0 p-2 space-x-2 z-10">
         <button
-          onClick={addGroupNode}
+          onClick={() => addGroupNode()}
           className="px-4 py-2 bg-blue-500 text-white rounded-md"
         >
           Add Node
@@ -154,23 +183,23 @@ function Flow() {
           {showPane ? <IoArrowUpSharp style={{ color: 'white' }} /> : <IoArrowDownSharp style={{ color: 'white' }} />}
         </button>
       </div>
-      <div className="w-full h-full">
-        <div className='h-full w-full bg-blue-200'>
-          <ReactFlow
-            nodes={nodes}
-            edges={edges}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            onConnect={onConnect}
-            onNodeContextMenu={onNodeContextMenu}
-            className="w-full h-full"
-            nodeTypes={nodeTypes}
-            style={{ height: '100%', width: '100%' }}
-          >
-            <Controls position="top-right" />
-            <Background />
-          </ReactFlow>
-        </div>
+      <div   style={{ height: '100%', width: '100%' }}>
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          onNodeContextMenu={onNodeContextMenu}
+          className="w-full h-full"
+          nodeTypes={nodeTypes}
+          style={{ height: '100%', width: '100%' }}
+          onDrop={handleDrop}
+          id='flow-area'
+        >
+          <Controls position="top-right" />
+          <Background />
+        </ReactFlow>
       </div>
       {contextMenu && (
         <div
@@ -205,7 +234,10 @@ function Flow() {
                 {paneItems.map((item) => (
                   <div
                     key={item.id}
-                    className="flex items-center cursor-pointer bg-gray-700 text-white p-2 rounded"
+                    draggable
+                    onDragStart={() => setActiveCard(item.label)}
+                    onDragEnd={() => setActiveCard(null)}
+                    className="flex cursor-grab items-center bg-gray-700 text-white p-2 rounded"
                   >
                     {item.icon}
                     <span className="ml-2">{item.label}</span>
@@ -213,6 +245,7 @@ function Flow() {
                 ))}
               </div>
             </div>
+            <h1>{activeCard ? `Dragging: ${activeCard}` : 'No card dragged'}</h1>
           </div>
         </div>
       )}

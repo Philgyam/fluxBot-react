@@ -1,34 +1,12 @@
 import React, { useState } from 'react';
 import { Handle, Position } from 'reactflow';
 import { IoIosAddCircleOutline } from 'react-icons/io';
-import { useDroppable } from '@dnd-kit/core';
 
 function GroupNode({ data, onAddChild, onChildClick }) {
   const [children, setChildren] = useState(data.children || []);
   const [childCounter, setChildCounter] = useState(children.length);
-  const [inputValue, setInputValue] = useState('New node');
-
-  const { isOver, setNodeRef } = useDroppable({
-    id: data.id,
-    onDrop: (event) => {
-      const droppedItemId = event.active.id;
-      const droppedItem = event.active.data.current;
-
-      console.log('Dropped item ID:', droppedItemId);
-      console.log('Dropped item data:', droppedItem);
-
-      if (droppedItem) {
-        const newChild = {
-          id: `${data.id}-child-${childCounter + 1}`,
-          data: {
-            label: droppedItem.label || `Child ${childCounter + 1}`,
-          },
-        };
-        setChildren((prev) => [...prev, newChild]);
-        setChildCounter((prev) => prev + 1);
-      }
-    },
-  });
+  const [inputValue, setInputValue] = useState('Group');
+  const [borderColor, setBorderColor] = useState('gray-800'); // Default border color
 
   const handleInputChange = (e) => {
     setInputValue(e.target.value);
@@ -52,11 +30,49 @@ function GroupNode({ data, onAddChild, onChildClick }) {
     if (onChildClick) onChildClick(child);
   };
 
+  const handleDragOver = (event) => {
+    event.preventDefault(); // Allow drop
+    setBorderColor('green-500'); // Change border color on drag over
+  };
+
+  const handleDragEnter = (event) => {
+    
+  };
+
+  const handleDragLeave = (event) => {
+    event.preventDefault(); // Allow drop
+    setBorderColor('gray-800'); // Reset border color on drag leave
+  };
+
+  const handleDrop = (event) => {
+    event.preventDefault(); // Allow drop
+    event.stopPropagation(); // Stop event from bubbling
+    handleAddChild()
+
+    setBorderColor('gray-800'); // Reset border color on drop
+
+    const dataTransfer = event.dataTransfer.getData('text');
+    if (dataTransfer) {
+      // Example of creating a new child node
+      const newChild = {
+        id: `${data.id}-child-${childCounter + 1}`,
+        data: {
+          label: `Child ${childCounter + 1}`,
+        },
+      };
+      setChildren((prev) => [...prev, newChild]);
+      setChildCounter((prev) => prev + 1);
+    }
+  };
+
   return (
     <div
-      ref={setNodeRef}
-      className={`bg-gray-800 ${isOver ? 'border-2 border-green-800' : ''} rounded shadow px-2 py-8`}
+      className={`bg-gray-800 ${borderColor ? `border-2 border-${borderColor}` : ''} rounded shadow px-1 py-4`}
       style={{ minWidth: 200, position: 'relative' }}
+      onDragOver={handleDragOver}
+      onDragEnter={handleDragEnter}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
     >
       <div className="bg-blue-500 text-white p-2 rounded-t">
         <input
@@ -70,10 +86,10 @@ function GroupNode({ data, onAddChild, onChildClick }) {
         {children.map((child) => (
           <div
             key={child.id}
-            className="bg-gray-100 rounded p-2 m-2 shadow-inner cursor-pointer"
+            className="bg-gray-100 rounded mb-3 p-2 m-2 shadow-inner cursor-pointer"
             onClick={() => handleChildClick(child)}
           >
-            {child.data.label}
+            Node
           </div>
         ))}
       </div>
