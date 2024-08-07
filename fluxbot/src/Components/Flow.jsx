@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import ReactFlow, {
   Controls,
   Background,
@@ -44,6 +44,8 @@ function Flow() {
     { id: '5', icon: <AiOutlineDeploymentUnit />, label: 'Carousel' },
     { id: '6', icon: <FaImage />, label: 'Image' },
   ]);
+  const [draggedItemLabel, setDraggedItemLabel] = useState();
+  const [childItem, setChildItem] = useState('hello');
 
   const togglePane = () => {
     setShowPane((prevShowPane) => !prevShowPane);
@@ -77,18 +79,23 @@ function Flow() {
     []
   );
 
-  const addGroupNode = (position) => {
+  const addGroupNode = (position, draggedItemLabel) => {
     const newNodeId = `node-${nodes.length + 1}`;
     const newChildId = `node-${nodes.length + 2}`;
+
+    console.log('Adding group node with label:', draggedItemLabel);
+    console.log('Child item:', childItem);
+
     const newNode = {
       id: newNodeId,
       type: 'groupNode',
       data: {
-        label: `Group ${nodes.length + 1}`,
+        label: draggedItemLabel || `Group ${nodes.length + 1}`,
+        activeCard: activeCard || null,  // Pass activeCard here
         children: [
           {
             id: newChildId,
-            data: { label: `Child ${nodes.length + 1}` },
+            data: { label: childItem || `Child ${nodes.length + 1}` },
           },
         ],
       },
@@ -137,6 +144,11 @@ function Flow() {
   const [activeCard, setActiveCard] = useState(null);
   const [showDrop, setShowDrop] = useState(false);
 
+  useEffect(() => {
+    console.log('Active card updated:', activeCard);
+    setChildItem(activeCard);
+  }, [activeCard]);
+
   const handleDragOver = (event) => {
     event.preventDefault();
     setShowDrop(true);
@@ -144,25 +156,24 @@ function Flow() {
 
   const handleDrop = (event) => {
     event.preventDefault();
-    event.stopPropagation(); 
+    event.stopPropagation();
     setShowDrop(false);
-  
-    // Check if the drop target has the ID 'flow-area'
+
     const targetElement = event.currentTarget;
+
     if (targetElement.id === 'flow-area') {
-      // Calculate the drop position relative to the ReactFlow container
       const containerRect = targetElement.getBoundingClientRect();
       const x = event.clientX - containerRect.left;
       const y = event.clientY - containerRect.top;
-  
-      // Call the function to add a new node
-      addGroupNode({ x, y });
+
+      console.log('Dropping at:', { x, y });
+      console.log('Active card during drop:', activeCard);
+
+      addGroupNode({ x, y }, activeCard);
     } else {
-      // Do nothing if the drop target doesn't have the ID 'flow-area'
       console.log('Drop target is not the flow area.');
     }
   };
-  
 
   return (
     <div
@@ -170,7 +181,6 @@ function Flow() {
       className="bg-gray-900 h-full flex transition-all duration-300"
       onClick={() => setContextMenu(null)}
       onDragOver={handleDragOver}
-     
     >
       <div className="absolute top-0 left-0 p-2 space-x-2 z-10">
         <button
@@ -183,7 +193,7 @@ function Flow() {
           {showPane ? <IoArrowUpSharp style={{ color: 'white' }} /> : <IoArrowDownSharp style={{ color: 'white' }} />}
         </button>
       </div>
-      <div   style={{ height: '100%', width: '100%' }}>
+      <div style={{ height: '100%', width: '100%' }}>
         <ReactFlow
           nodes={nodes}
           edges={edges}
@@ -235,8 +245,15 @@ function Flow() {
                   <div
                     key={item.id}
                     draggable
-                    onDragStart={() => setActiveCard(item.label)}
-                    onDragEnd={() => setActiveCard(null)}
+                    onDragStart={(e) => (
+                      setActiveCard(item.label),
+                      setDraggedItemLabel(item.label),
+                      setChildItem(item.label)
+                    )}
+                    onDragEnd={() => (
+                      setDraggedItemLabel(item.label),
+                      setChildItem('')
+                    )}
                     className="flex cursor-grab items-center bg-gray-700 text-white p-2 rounded"
                   >
                     {item.icon}
