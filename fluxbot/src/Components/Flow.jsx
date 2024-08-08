@@ -41,11 +41,11 @@ function Flow() {
     { id: '2', icon: <ImFileEmpty />, label: 'File' },
     { id: '3', icon: <AiOutlineAudio />, label: 'Audio' },
     { id: '4', icon: <CiVideoOn />, label: 'Video' },
-    { id: '5', icon: <AiOutlineDeploymentUnit />, label: 'Carousel' },
+    { id: '5', icon: <AiOutlineDeploymentUnit />, label: 'carousel' },
     { id: '6', icon: <FaImage />, label: 'Image' },
   ]);
-  const [draggedItemLabel, setDraggedItemLabel] = useState();
-  const [childItem, setChildItem] = useState('hello');
+  const [draggedItemLabel, setDraggedItemLabel] = useState(null);
+  const [childItem, setChildItem] = useState('');
 
   const togglePane = () => {
     setShowPane((prevShowPane) => !prevShowPane);
@@ -80,27 +80,26 @@ function Flow() {
   );
 
   const addGroupNode = (position, draggedItemLabel) => {
-    const newNodeId = `node-${nodes.length + 1}`;
-    const newChildId = `node-${nodes.length + 2}`;
+    const newNodeId = `node-${nodes.length}`;
+    const newChildId = `node-${nodes.length + 1}`;
 
-    console.log('Adding group node with label:', draggedItemLabel);
-    console.log('Child item:', childItem);
+   
 
     const newNode = {
       id: newNodeId,
       type: 'groupNode',
       data: {
-        label: draggedItemLabel || `Group ${nodes.length + 1}`,
-        activeCard: activeCard || null,  // Pass activeCard here
+        label:  `Group#${nodes.length }`,
+        activeCard: draggedItemLabel || null,
         children: [
           {
             id: newChildId,
-            data: { label: childItem || `Child ${nodes.length + 1}` },
+            data: { label: childItem || `Empty Node` },
           },
         ],
       },
       position: position || { x: Math.random() * 400, y: Math.random() * 400 },
-    };
+    }
 
     setNodes((prevNodes) => [...prevNodes, newNode]);
   };
@@ -145,7 +144,6 @@ function Flow() {
   const [showDrop, setShowDrop] = useState(false);
 
   useEffect(() => {
-    console.log('Active card updated:', activeCard);
     setChildItem(activeCard);
   }, [activeCard]);
 
@@ -166,12 +164,19 @@ function Flow() {
       const x = event.clientX - containerRect.left;
       const y = event.clientY - containerRect.top;
 
-      console.log('Dropping at:', { x, y });
-      console.log('Active card during drop:', activeCard);
+     
 
-      addGroupNode({ x, y }, activeCard);
+      addGroupNode({ x, y }, draggedItemLabel);
+
+      // Reset the dragged item state
+      setDraggedItemLabel(null);
+      setActiveCard(null);
     } else {
       console.log('Drop target is not the flow area.');
+
+      // Reset the dragged item state even if the drop was invalid
+      setDraggedItemLabel(null);
+      setActiveCard(null);
     }
   };
 
@@ -245,14 +250,14 @@ function Flow() {
                   <div
                     key={item.id}
                     draggable
-                    onDragStart={(e) => (
+                    onDragStart={(event) => (
                       setActiveCard(item.label),
                       setDraggedItemLabel(item.label),
-                      setChildItem(item.label)
+                      event.dataTransfer.setData('label', item.label)
                     )}
                     onDragEnd={() => (
-                      setDraggedItemLabel(item.label),
-                      setChildItem('')
+                      setDraggedItemLabel(null),
+                      setActiveCard(null)
                     )}
                     className="flex cursor-grab items-center bg-gray-700 text-white p-2 rounded"
                   >
